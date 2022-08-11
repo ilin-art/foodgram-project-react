@@ -19,7 +19,7 @@ http://51.250.22.204/api/redoc
   ```docker-compose exec web python manage.py migrate --noinput```<br>
   ```docker-compose exec web python manage.py createsuperuser```<br>
   ```docker-compose exec web python manage.py collectstatic --no-input ```
-5. Теперь проект доступен по адресу http://51.250.22.204
+5. Теперь проект доступен по адресу http://127.0.0.1
 
 # Технологии
 * Python
