@@ -19,7 +19,8 @@ import {
   RecipeEdit,
   RecipeCreate,
   User,
-  ChangePassword
+  ChangePassword,
+  Shop
 } from './pages'
 
 import { AuthContext, UserContext } from './contexts'
@@ -131,7 +132,7 @@ function App() {
     api
       .getRecipes({
         page: 1,
-        is_in_shopping_cart: Number(true)
+        is_in_shopping_cart: true
       })
       .then(res => {
         const { count } = res
@@ -166,7 +167,7 @@ function App() {
   }, [])
 
   if (loggedIn === null) {
-    return <div className={styles.loading}>Loading!!</div>
+    return <div className={styles.loading}>Loading</div>
   }
   
   return <AuthContext.Provider value={loggedIn}>
@@ -212,6 +213,14 @@ function App() {
             updateOrders={updateOrders}
           />
 
+          <ProtectedRoute 
+            exact
+            path='/shop'
+            component = {Shop}
+            loggedIn={loggedIn}
+            
+          />
+
           <ProtectedRoute
             exact
             path='/recipes/create'
@@ -225,7 +234,6 @@ function App() {
             component={RecipeEdit}
             loggedIn={loggedIn}
             loadItem={loadSingleItem}
-            onItemDelete={getOrders}
           />
           <ProtectedRoute
             exact
