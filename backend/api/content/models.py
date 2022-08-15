@@ -62,7 +62,7 @@ class Recipe(models.Model):
         Tag,
         related_name='recipes',
         verbose_name='Теги')
-    cooking_time = models.IntegerField(
+    cooking_time = models.PositiveIntegerField(
         default=1,
         verbose_name='Время приготовленмя')
 
@@ -83,9 +83,9 @@ class IngredientsRecipe(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Рецепт',
         related_name='recipe_content')
-    amount = models.IntegerField(
+    amount = models.PositiveIntegerField(
         default=1,
-        verbose_name='Количество ингредиентор')
+        verbose_name='Количество ингредиентов')
 
     class Meta:
         constraints = [
