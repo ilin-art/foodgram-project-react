@@ -1,7 +1,6 @@
 from rest_framework import permissions
 from users.models import UserRole
 
-
 METHODS = ['POST', 'PATCH', 'DELETE']
 ROLES = [UserRole.ADMIN]
 

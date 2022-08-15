@@ -1,8 +1,8 @@
 from django.contrib import admin
+
 from import_export.admin import ImportMixin
 from shop.models import Cart, Item, Product
 from shop.resources import CartResource, ItemResource, ProductResource
-
 
 
 class ProductAdmin(ImportMixin, admin.ModelAdmin):
