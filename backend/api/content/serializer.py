@@ -86,15 +86,15 @@ class PostRecipeSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
 
-        for ingredient in ingredients:
-            current_ingredient = (
-                Ingredient.objects.get(pk=ingredient['ingredient']['id'].id)
-            )
-            IngredientsRecipe.objects.create(
-                ingredient=current_ingredient,
+        new_ingredients = [
+            IngredientsRecipe(
                 recipe=recipe,
-                amount=ingredient['amount']
+                ingredient = get_object_or_404(Ingredient, id=ingredient['ingredient']['id'].id),
+                amount = ingredient['amount'],
             )
+            for ingredient in ingredients
+        ]
+        IngredientsRecipe.objects.bulk_create(new_ingredients)
         return recipe
 
     def update(self, instance, validated_data):
