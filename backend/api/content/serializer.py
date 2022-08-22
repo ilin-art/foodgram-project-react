@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from users.serializers import UserSerializer
+from rest_framework.validators import UniqueTogetherValidator
 
 from .models import (Favourite, Ingredient, IngredientsRecipe, Recipe,
                      Shopping, Tag)
@@ -26,6 +27,21 @@ class AddIngredientsSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'name', 'measurement_unit', 'amount', )
         model = IngredientsRecipe
+        validators = [
+            UniqueTogetherValidator(
+                queryset=IngredientsRecipe.objects.all(),
+                fields=['ingredient', 'recipe']
+            )
+        ]
+
+
+class IngredientsEditSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+    amount = serializers.IntegerField()
+
+    class Meta:
+        model = Ingredient
+        fields = ('id', 'amount')
 
 
 class TagsSerializer(serializers.ModelSerializer):
@@ -98,7 +114,7 @@ class PostRecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        if 'ingredients' in self.initial_data:
+        if 'ingredients' in data['ingredients']:
             ingredients = self.context['request'].data['ingredients']
             instance.ingredients.clear()
             self.ingtedient_create(ingredients, instance)
@@ -115,11 +131,15 @@ class PostRecipeSerializer(serializers.ModelSerializer):
         return instance
 
     def validate(self, data):
-        ingredients = self.initial_data.get('ingredients')
+        ingredients = data['ingredients']
+        # ingredients = self.initial_data.get('ingredients')
+        print(ingredients)
         ingredients_set = set()
-        tags = self.initial_data.get('tags')
+        # tags = self.initial_data.get('tags')
+        tags = self.data['tags']
         tags_set = set()
-        cooking_time = self.initial_data.get('cooking_time')
+        # cooking_time = self.initial_data.get('cooking_time')
+        cooking_time = data['cooking_time']
         if not ingredients:
             raise serializers.ValidationError('Выберите ингредиенты')
         if not tags:
