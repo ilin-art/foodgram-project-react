@@ -91,14 +91,14 @@ class PostRecipeSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-        self.ingtedient_create(ingredients, recipe)
+        self.ingredient_create(ingredients, recipe)
         return recipe
 
     def update(self, instance, validated_data):
         if 'recipe_content' in validated_data:
             ingredients = validated_data.pop('recipe_content')
             instance.ingredients.clear()
-            self.ingtedient_create(ingredients, instance)
+            self.ingredient_create(ingredients, instance)
         if 'tags' in validated_data:
             tags = validated_data.pop('tags')
             instance.tags.set(tags)
@@ -134,13 +134,15 @@ class PostRecipeSerializer(serializers.ModelSerializer):
             tags_set.add(tag)
         return data
 
-    def ingtedient_create(self, ingredients, recipe):
-        bulk_list = list()
-        for ingredient in ingredients:
-            bulk_list.append(IngredientsRecipe(
+    def ingredient_create(self, ingredients, recipe):
+        bulk_list = [
+            IngredientsRecipe(
                 recipe=recipe,
                 ingredient=ingredient['ingredient'].get('id'),
-                amount=ingredient.get('amount')))
+                amount=ingredient.get('amount')
+            )
+            for ingredient in ingredients
+        ]
         IngredientsRecipe.objects.bulk_create(bulk_list)
 
 
