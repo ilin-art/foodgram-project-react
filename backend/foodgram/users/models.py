@@ -3,6 +3,11 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 
 
+class UserRole(models.TextChoices):
+    USER = 'user'
+    ADMIN = 'admin'
+
+
 class CustomUserManager(UserManager):
 
     def _create_user(self, email, password, **extra_fields):
