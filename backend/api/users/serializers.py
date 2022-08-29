@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from .models import SubscribedUser, User
 
+
 User = get_user_model()
 
 
@@ -52,7 +53,7 @@ class SubscribeSerializer(UserSerializer):
         }
 
     def get_recipes(self, obj):
-        from content.serializer import ShortRecipeSerializer
+        from content.serializer import ShortRecipeSerializer #Этот импорт вызывает циклическую зависимость, нашел решение что можно сделать так
         limit = 10
         try:
             limit = self.context['request'].query_params['recipes_limit']

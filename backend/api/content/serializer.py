@@ -124,8 +124,8 @@ class PostRecipeSerializer(serializers.ModelSerializer):
             if int(ingredient['amount']) <= 0:
                 raise serializers.ValidationError(
                         'Значение колво ингредиента должно быть положительным')
-            id = ingredient['ingredient'].get('id')
-            if id in ingredients_set:
+            ingredient_id = ingredient['ingredient'].get('id')
+            if ingredient_id in ingredients_set:
                 raise serializers.ValidationError('Ингредиент уже добавлен')
             ingredients_set.add(id)
         for tag in tags:

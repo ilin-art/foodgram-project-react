@@ -43,8 +43,7 @@ class UserViewSet(UserViewSet):
             if SubscribedUser.objects.filter(user=self.request.user,
                                              user_subscribed_to=user_subscribed_to).exists():
                 return Response({'errors': 'Вы уже подписаны на пользователя'})
-            else:
-                SubscribedUser.objects.create(user=self.request.user,
+            SubscribedUser.objects.create(user=self.request.user,
                                               user_subscribed_to=user_subscribed_to)
             return Response(serializer.data)
         if request.method == 'DELETE':
@@ -55,6 +54,5 @@ class UserViewSet(UserViewSet):
                                                          user_subscribed_to=user_subscribed_to)
                 instance.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({'errors': 'Вы не подписаны на пользователя'},
-                                status=status.HTTP_400_BAD_REQUEST)
+            return Response({'errors': 'Вы не подписаны на пользователя'},
+                            status=status.HTTP_400_BAD_REQUEST)
