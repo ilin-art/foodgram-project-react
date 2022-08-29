@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 
+from content.serializer import ShortRecipeSerializer
 from .models import SubscribedUser, User
 
 
@@ -53,8 +54,6 @@ class SubscribeSerializer(UserSerializer):
         }
 
     def get_recipes(self, obj):
-        from content.serializer import ShortRecipeSerializer #Этот импорт вызывает циклическую зависимость, нашел решение что можно сделать так
-        limit = 10
         try:
             limit = self.context['request'].query_params['recipes_limit']
         except Exception:
