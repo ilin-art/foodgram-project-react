@@ -32,10 +32,10 @@ class UserViewSet(UserViewSet):
         return Response(serializer.data)
 
     @action(detail=True,
-            methods=['POST', 'DELETE'],
+            methods=['GET', 'DELETE'],
             permission_classes=[IsAuthenticated])
     def subscribe(self, request, id=None):
-        if request.method == 'POST':
+        if request.method == 'GET':
             user_subscribed_to = get_object_or_404(User, pk=id)
             serializer = SubscribeSerializer(user_subscribed_to)
 
