@@ -11,7 +11,7 @@ services:
 
   backend:
     build:
-      context: ../backend/api
+      context: ../backend/foodgram
       dockerfile: Dockerfile
     image: infra_backend
     restart: always
