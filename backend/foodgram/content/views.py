@@ -1,6 +1,9 @@
+import io
+
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.http import FileResponse
 from reportlab.lib.colors import black, blue
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -13,7 +16,7 @@ from rest_framework.permissions import (IsAuthenticated,
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
-from .filters import RecipeFilter, IngredientSearchFilter
+from .filters import IngredientSearchFilter, RecipeFilter
 from .models import (Favourite, Ingredient, IngredientsRecipe, Recipe,
                      Shopping, Tag)
 from .paginators import CustomPageNumberPaginator
@@ -77,83 +80,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=False,
             methods=['GET'],
             permission_classes=[IsAuthenticated])
-    def download_shopping_cart(self, request, pk=None):
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="shopping.pdf"'
-        p = canvas.Canvas(response)
-        pdfmetrics.registerFont(TTFont('DejaVuSans','DejaVuSans.ttf', 'UTF-8'))
+    def download_shopping_cart(self, request):
+        ingredients = IngredientsRecipe.objects.filter(
+            recipe__shoppings__user=request.user).values(
+            'ingredient__name',
+            'ingredient__measurement_unit').annotate(total=Sum('amount'))
 
-        res = []
-        name = []
-
-        rec_names = (
-                Recipe.objects.values(
-                    'name',
-                )
-                .filter(shoppings__user=request.user)
-            )
-        for item in rec_names:
-            name.append(
-                f"{item['name'].capitalize()}"
-            )
-        
-        rec_ingredients = (
-                IngredientsRecipe.objects.values(
-                    'ingredient__name',
-                    'ingredient__measurement_unit',
-                )
-                .filter(recipe__shoppings__user=request.user)
-                .annotate(Sum('amount'))
-            )
-        for rec_ingredient in rec_ingredients:
-            res.append(
-                f"{rec_ingredient['ingredient__name'].capitalize()} - "
-                f"{rec_ingredient['amount__sum']} "
-                f"{rec_ingredient['ingredient__measurement_unit']}"
-            )
-
-        line_position = 800
-        title = f"Список на сегодня:"
-        p.setFont("DejaVuSans", 25)
-        p.setFillColor(blue)
-        p.drawString(30, line_position, title)
-
-        p.setFillColor(blue)
-        line_position -= 10
-        p.line(30, line_position, 500, line_position)
-        
-        p.setFillColor(black)
-        title = f"Список рецептов:"
-        p.setFont("DejaVuSans", 17)
-        line_position -= 40
-        p.drawString(30, line_position, title)
-        title = f"Список инградиентов:"
-        p.drawString(300, line_position, title)
-
-        p.setFillColor(blue)
-        line_position -= 10
-        p.line(30, line_position, 230, line_position)
-        p.line(300, line_position, 500, line_position)
-
-
-        p.setFillColor(black)
-        p.setFont("DejaVuSans", 15)
-        line_position -= 10
-
-        line_position_ = line_position
-        for name_item in name:
-            data = str(name_item)
-            line_position_ -= 22
-            p.drawString(40, line_position_, data)
-
-        p.setFont("DejaVuSans", 15)
-        for recipes_item in res:
-            data = str(recipes_item)
-            line_position -= 22
-            p.drawString(310, line_position, data)
-        
-        p.showPage()
-        p.save()
+        shopping_cart = '\n'.join([
+            f'{ingredient["ingredient__name"]} - {ingredient["total"]} '
+            f'{ingredient["ingredient__measurement_unit"]}'
+            for ingredient in ingredients
+        ])
+        filename = 'shopping_cart.txt'
+        response = HttpResponse(shopping_cart, content_type='text/plain')
+        response['Content-Disposition'] = f'attachment; filename={filename}'
         return response
 
 

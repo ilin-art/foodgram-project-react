@@ -1,7 +1,8 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-
 from users.serializers import UserSerializer
+
+
 from .models import (Favourite, Ingredient, IngredientsRecipe, Recipe,
                      Shopping, Tag)
 
@@ -125,9 +126,12 @@ class PostRecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                         'Значение колво ингредиента должно быть положительным')
             ingredient_id = ingredient['ingredient'].get('id')
+            print(ingredient_id)
+            print(ingredients_set)
             if ingredient_id in ingredients_set:
                 raise serializers.ValidationError('Ингредиент уже добавлен')
-            ingredients_set.add(id)
+            print(id)
+            ingredients_set.add(ingredient_id)
         for tag in tags:
             if tag in tags_set:
                 raise serializers.ValidationError('Этот тэг уже выбран')
