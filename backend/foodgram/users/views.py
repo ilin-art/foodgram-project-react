@@ -37,7 +37,7 @@ class UserViewSet(UserViewSet):
     def subscribe(self, request, id=None):
         if request.method == 'GET':
             user_subscribed_to = get_object_or_404(User, pk=id)
-            serializer = SubscribeSerializer(user_subscribed_to)
+            serializer = SubscribeSerializer(user_subscribed_to, context={'request': request})
 
             if SubscribedUser.objects.filter(user=self.request.user,
                                              user_subscribed_to=user_subscribed_to).exists():
